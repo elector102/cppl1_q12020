@@ -68,13 +68,13 @@
 // Due to C++ preprocessor weirdness, we need double indirection to
 // concatenate two tokens when one of them is __LINE__.  Writing
 //
-//   foo ## __LINE__
+//   isometry ## __LINE__
 //
-// will result in the token foo__LINE__, instead of foo followed by
+// will result in the token foo__LINE__, instead of isometry followed by
 // the current line number.  For more details, see
 // http://www.parashift.com/c++-faq-lite/misc-technical-issues.html#faq-39.6
-#define GTEST_CONCAT_TOKEN_(foo, bar) GTEST_CONCAT_TOKEN_IMPL_(foo, bar)
-#define GTEST_CONCAT_TOKEN_IMPL_(foo, bar) foo ## bar
+#define GTEST_CONCAT_TOKEN_(isometry, bar) GTEST_CONCAT_TOKEN_IMPL_(isometry, bar)
+#define GTEST_CONCAT_TOKEN_IMPL_(isometry, bar) isometry ## bar
 
 class ProtocolMessage;
 namespace proto2 { class Message; }
@@ -205,10 +205,10 @@ GTEST_API_ std::string DiffStrings(const std::string& left,
 // (e.g. ASSERT_EQ, EXPECT_STREQ, etc) failure.
 //
 // The first four parameters are the expressions used in the assertion
-// and their values, as strings.  For example, for ASSERT_EQ(foo, bar)
-// where foo is 5 and bar is 6, we have:
+// and their values, as strings.  For example, for ASSERT_EQ(isometry, bar)
+// where isometry is 5 and bar is 6, we have:
 //
-//   expected_expression: "foo"
+//   expected_expression: "isometry"
 //   actual_expression:   "bar"
 //   expected_value:      "5"
 //   actual_value:        "6"

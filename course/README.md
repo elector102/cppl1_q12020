@@ -18,7 +18,7 @@ make
 ## To change the library name
 
 Just go to `{REPO_PATH}/CMakeLists.txt` and replace, in `add_library` macro,
-`foo` by your `library_name`.
+`isometry` by your `library_name`.
 
 ## To add new source files
 

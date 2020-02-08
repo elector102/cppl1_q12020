@@ -350,7 +350,7 @@ FilePath FilePath::RemoveTrailingPathSeparator() const {
 }
 
 // Removes any redundant separators that might be in the pathname.
-// For example, "bar///foo" becomes "bar/foo". Does not eliminate other
+// For example, "bar///isometry" becomes "bar/isometry". Does not eliminate other
 // redundancies that might be in a pathname involving "." or "..".
 // TODO(wan@google.com): handle Windows network shares (e.g. \\server\share).
 void FilePath::Normalize() {

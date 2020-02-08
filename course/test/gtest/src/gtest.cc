@@ -1298,10 +1298,10 @@ std::vector<std::string> SplitEscapedString(const std::string& str) {
 // (e.g. ASSERT_EQ, EXPECT_STREQ, etc) failure.
 //
 // The first four parameters are the expressions used in the assertion
-// and their values, as strings.  For example, for ASSERT_EQ(foo, bar)
-// where foo is 5 and bar is 6, we have:
+// and their values, as strings.  For example, for ASSERT_EQ(isometry, bar)
+// where isometry is 5 and bar is 6, we have:
 //
-//   lhs_expression: "foo"
+//   lhs_expression: "isometry"
 //   rhs_expression: "bar"
 //   lhs_value:      "5"
 //   rhs_value:      "6"

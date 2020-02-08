@@ -171,7 +171,7 @@ class GTEST_API_ FilePath {
 
  private:
   // Replaces multiple consecutive separators with a single separator.
-  // For example, "bar///foo" becomes "bar/foo". Does not eliminate other
+  // For example, "bar///isometry" becomes "bar/isometry". Does not eliminate other
   // redundancies that might be in a pathname involving "." or "..".
   //
   // A pathname with multiple consecutive separators may occur either through
@@ -180,15 +180,15 @@ class GTEST_API_ FilePath {
   // may NOT generate a pathname with a trailing "/". Then elsewhere that
   // pathname may have another "/" and pathname components added to it,
   // without checking for the separator already being there.
-  // The script language and operating system may allow paths like "foo//bar"
+  // The script language and operating system may allow paths like "isometry//bar"
   // but some of the functions in FilePath will not handle that correctly. In
   // particular, RemoveTrailingPathSeparator() only removes one separator, and
   // it is called in CreateDirectoriesRecursively() assuming that it will change
   // a pathname from directory syntax (trailing separator) to filename syntax.
   //
   // On Windows this method also replaces the alternate path separator '/' with
-  // the primary path separator '\\', so that for example "bar\\/\\foo" becomes
-  // "bar\\foo".
+  // the primary path separator '\\', so that for example "bar\\/\\isometry" becomes
+  // "bar\\isometry".
 
   void Normalize();
 

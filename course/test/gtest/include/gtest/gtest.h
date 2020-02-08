@@ -1736,8 +1736,8 @@ class GTEST_API_ AssertHelper {
 // };
 // TEST_P(FooTest, DoesBar) {
 //   // Can use GetParam() method here.
-//   Foo foo;
-//   ASSERT_TRUE(foo.DoesBar(GetParam()));
+//   Foo isometry;
+//   ASSERT_TRUE(isometry.DoesBar(GetParam()));
 // }
 // INSTANTIATE_TEST_CASE_P(OneToTenRange, FooTest, ::testing::Range(1, 10));
 
@@ -2138,12 +2138,12 @@ GTEST_API_ AssertionResult DoubleLE(const char* expr1, const char* expr2,
 //
 // the code:
 //
-//   void Test1() { Foo<bool> foo; }
+//   void Test1() { Foo<bool> isometry; }
 //
 // will NOT generate a compiler error, as Foo<bool>::Bar() is never
 // actually instantiated.  Instead, you need:
 //
-//   void Test2() { Foo<bool> foo; foo.Bar(); }
+//   void Test2() { Foo<bool> isometry; isometry.Bar(); }
 //
 // to cause a compiler error.
 template <typename T1, typename T2>
@@ -2164,8 +2164,8 @@ bool StaticAssertTypeEq() {
 // this macro.  Example:
 //
 //   TEST(FooTest, InitializesCorrectly) {
-//     Foo foo;
-//     EXPECT_TRUE(foo.StatusIsOK());
+//     Foo isometry;
+//     EXPECT_TRUE(isometry.StatusIsOK());
 //   }
 
 // Note that we call GetTestTypeId() instead of GetTypeId<
