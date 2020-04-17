@@ -40,8 +40,8 @@ GTEST_TEST(Vector3Test, Vector3Operations) {
   EXPECT_EQ(ss.str(), "(x: 1, y: 2, z: 3)");
 
   EXPECT_TRUE(Vector3::kUnitX == Vector3(1., 0., 0));
-  EXPECT_TRUE(Vector3::kUnitX != ({1., 1., 0}));
-  EXPECT_TRUE(Vector3::kUnitY == ({0., 1., 0}));
+  EXPECT_TRUE(Vector3::kUnitX != Vector3(1., 1., 0));
+  EXPECT_TRUE(Vector3::kUnitY == Vector3(0., 1., 0));
   EXPECT_TRUE(Vector3::kUnitZ == Vector3::kUnitX.cross(Vector3::kUnitY));
   EXPECT_NEAR(Vector3::kUnitX.dot(Vector3::kUnitZ), 0., kTolerance);
 

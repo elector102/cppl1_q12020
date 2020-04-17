@@ -9,28 +9,19 @@
 #include <sstream>
 #include <string>
 
-
-
 namespace ekumen {
 namespace math {
 
-
 static constexpr int resolution{4};
-
 template <class T>
-typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type almost_equal(T x, T y, int ulp) {
-    // the machine epsilon has to be scaled to the magnitude of the values used
-    // and multiplied by the desired precision in ULPs (units in the last place)
-    return std::fabs(x - y) <= std::numeric_limits<T>::epsilon() * std::fabs(x + y) * ulp
-           // unless the result is subnormal
-           || std::fabs(x - y) < std::numeric_limits<T>::min();
+typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type almost_equal(T a, T b, int resolution) {
+    return std::fabs(a - b) <= std::numeric_limits<T>::epsilon() * std::fabs(a + b) * resolution
+           || std::fabs(a - b) < std::numeric_limits<T>::min();
 }
-
 
 class Vector3 {
     public:
-        Vector3();
-        Vector3(const double &x, const double &y, const double &z);
+        Vector3(const double &x = 0, const double &y = 0, const double &z = 0);
         ~Vector3();
 
         // Getter for elements of the vector.
@@ -74,6 +65,17 @@ class Vector3 {
     private:
         double x_, y_, z_;
 };
+
+inline Vector3 operator*(const double scalar, const Vector3& vector) {
+    Vector3 result(vector.x() * scalar, vector.y() * scalar, (vector.z() * scalar));
+    return result;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const Vector3& vector) {
+    return os << "(x: " << std::to_string(static_cast<int>(vector.x()))
+              << ", y: " << std::to_string(static_cast<int>(vector.y()))
+              << ", z: " << std::to_string(static_cast<int>(vector.z())) << ")";
+}
 
 }
 }

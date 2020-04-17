@@ -7,8 +7,6 @@ namespace math {
 
 Vector3::Vector3(const double& x, const double& y, const double& z) : x_(x), y_(y), z_(z) {}
 
-Vector3::Vector3() {}
-
 Vector3::~Vector3() {}
 
 // Class constants
@@ -21,7 +19,7 @@ Vector3 Vector3::operator+(const Vector3& vec) const {
     return Vector3(this->x() + vec.x(), this->y() + vec.y(), this->z() + vec.z());
 }
 Vector3 Vector3::operator-(const Vector3& vec) const {
-    return Vector3(this->x() - vec.z(), this->y() - vec.y(), this->z() - vec.z());
+    return Vector3(this->x() - vec.x(), this->y() - vec.y(), this->z() - vec.z());
 }
 Vector3 Vector3::operator*(const double& value) const {
     return Vector3(this->x() * value, this->y() * value, this->z() * value);
@@ -73,11 +71,11 @@ bool Vector3::operator==(const std::initializer_list<double>& vector) const {
     return true;
 }
 
-bool Vector3::operator==(const Vector3& a) const {
-    return (Vector3(x_, y_, z_) == std::initializer_list<double>({a.x_, a.y_, a.z_}));
+bool Vector3::operator==(const Vector3& vector) const {
+    return (Vector3(x_, y_, z_) == std::initializer_list<double>({vector.x_, vector.y_, vector.z_}));
 }
-bool ekumen::math::Vector3::operator != (const Vector3& v) const {
-    return !(*this == v);
+bool ekumen::math::Vector3::operator != (const Vector3& vector) const {
+    return !(*this == vector);
 }
 
 bool ekumen::math::Vector3::operator != (const std::initializer_list<double>& list) const {
@@ -88,14 +86,14 @@ double Vector3::norm() const {
     return std::sqrt(std::pow(this->x(), 2.0) + std::pow(this->y(), 2.0) + std::pow(this->z(), 2.0));
 };
 
-double Vector3::dot(const Vector3& v) const {
-    return ((this->x() * v.x()) + (this->y() * v.y()) + (this->z() * v.z()));
+double Vector3::dot(const Vector3& vector) const {
+    return ((this->x() * vector.x()) + (this->y() * vector.y()) + (this->z() * vector.z()));
 };
 
-Vector3 Vector3::cross(const Vector3& v) const {
-    auto i = (this->y() * v.z()) - (v.y() * this->z());
-    auto j = (this->x() * v.z()) - (v.x() * this->z());
-    auto k = (this->x() * v.y()) - (v.x() * this->y());
+Vector3 Vector3::cross(const Vector3& vector) const {
+    auto i = (this->y() * vector.z()) - (vector.y() * this->z());
+    auto j = (this->x() * vector.z()) - (vector.x() * this->z());
+    auto k = (this->x() * vector.y()) - (vector.x() * this->y());
 
     return Vector3(i, j, k);
 }
