@@ -1,5 +1,4 @@
-#ifndef ISOMETRY_H
-#define	ISOMETRY_H
+#pragma once
 
 // Standard libraries
 #include <cmath>
@@ -21,29 +20,27 @@ typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type almost_
 
 class Vector3 {
     public:
-        Vector3(const double &x = 0, const double &y = 0, const double &z = 0);
+        Vector3();
+        Vector3(const double &x, const double &y, const double &z);
         ~Vector3();
 
         // Getter for elements of the vector.
-        const double& x() const { return this->x_; };
-        const double& y() const { return this->y_; };
-        const double& z() const { return this->z_; };
+        const double& x() const { return x_; };
+        const double& y() const { return y_; };
+        const double& z() const { return z_; };
 
         // Setter for elements of the vector.
-        void x(const double &x) { this->x_ = x; };
-        void y(const double &y) { this->y_ = y; };
-        void z(const double &z) { this->z_ = z; };
 
         double& x() { return x_; };
         double& y() { return y_; };
         double& z() { return z_; };
 
         // Operators overloading.
-        Vector3 operator+(const Vector3& vec) const;
-        Vector3 operator-(const Vector3& vec) const;
+        Vector3 operator+(const Vector3& vector) const;
+        Vector3 operator-(const Vector3& vector) const;
         Vector3 operator*(const double& value) const;
-        Vector3 operator*(const Vector3& vec) const;
-        Vector3 operator/(const Vector3& vec) const;
+        Vector3 operator*(const Vector3& vector) const;
+        Vector3 operator/(const Vector3& vector) const;
         const double& operator[](const int &index) const;
         double& operator[](const int &index);
         bool operator==(const std::initializer_list<double>& rhs) const;
@@ -52,9 +49,9 @@ class Vector3 {
         bool operator!=(const Vector3& a) const;
 
 
-        double dot(const Vector3&) const;
+        double dot(const Vector3& vector) const;
         double norm() const;
-        Vector3 cross(const Vector3&) const;
+        Vector3 cross(const Vector3& vector) const;
 
         // Class constants
         static const Vector3 kUnitX;
@@ -79,5 +76,3 @@ inline std::ostream& operator<<(std::ostream& os, const Vector3& vector) {
 
 }
 }
-
-#endif
