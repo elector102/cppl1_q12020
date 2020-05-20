@@ -20,13 +20,26 @@ GTEST_TEST(Vector3Test, Vector3Operations) {
   const double kTolerance{1e-12};
   const Vector3 p{1., 2., 3.};
   const Vector3 q{4., 5., 6.};
-
   EXPECT_EQ(p + q, std::initializer_list<double>({5., 7., 9.}));
   EXPECT_EQ(p - q, std::initializer_list<double>({-3., -3., -3.}));
   EXPECT_EQ(p * 2., Vector3(2., 4., 6));
   EXPECT_EQ(2 * q, Vector3(8., 10., 12.));
   EXPECT_EQ(p * q, Vector3(4., 10., 18.));
   EXPECT_EQ(p / q, Vector3(.25, .4, .5));
+  Vector3 a = p;
+  EXPECT_EQ(a += q, std::initializer_list<double>({5., 7., 9.}));
+  a = p;
+  EXPECT_EQ(a -= q, std::initializer_list<double>({-3., -3., -3.}));
+  a = p;
+  EXPECT_EQ(a *= 2., Vector3(2., 4., 6));
+  a = p;
+  EXPECT_EQ(a *= q, Vector3(4., 10., 18.));
+  a = p;
+  EXPECT_EQ(a /= q, Vector3(.25, .4, .5));
+  a = p;
+  EXPECT_EQ(a = q, q);
+  a = p;
+  EXPECT_EQ(a = std::move(q), q);
   EXPECT_NEAR(p.norm(), 3.7416573867739413, kTolerance);
   EXPECT_EQ(p.x(), 1.);
   EXPECT_EQ(p.y(), 2.);
