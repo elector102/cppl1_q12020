@@ -96,5 +96,12 @@ inline std::ostream& operator<<(std::ostream& os, const Vector3& vector) {
               << ", z: " << std::to_string(static_cast<int>(vector.z())) << ")";
 }
 
+
+
+
+class Matrix3 {
+
+    
+}
 }
 }
