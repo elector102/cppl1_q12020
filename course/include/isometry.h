@@ -37,7 +37,10 @@ class Vector3 {
         Vector3(const Vector3& other) : v_(new Elements{*(other.v_)}) {};
 
         // move constructor
-        Vector3(Vector3&& other) : v_(std::__exchange(other.v_, nullptr)) {};
+        Vector3(Vector3&& other) {
+            v_ = other.v_;
+            other.v_ = nullptr;
+        }
 
         // Getter for elements of the vector.
         const double& x() const { return v_->x_; };
@@ -55,11 +58,11 @@ class Vector3 {
         Vector3 operator*(const double& value) const;
         Vector3 operator*(const Vector3& vector) const;
         Vector3 operator/(const Vector3& vector) const;
-        Vector3 operator+=(const Vector3& vector);
-        Vector3 operator-=(const Vector3& vector);
-        Vector3 operator*=(const double& value);
-        Vector3 operator*=(const Vector3& vector);
-        Vector3 operator/=(const Vector3& vector);
+        Vector3& operator+=(const Vector3& vector);
+        Vector3& operator-=(const Vector3& vector);
+        Vector3& operator*=(const double& value);
+        Vector3& operator*=(const Vector3& vector);
+        Vector3& operator/=(const Vector3& vector);
         const double& operator[](const int &index) const;
         double& operator[](const int &index);
         bool operator==(const std::initializer_list<double>& rhs) const;

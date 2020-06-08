@@ -31,27 +31,27 @@ Vector3 Vector3::operator/(const Vector3& vector) const {
     return Vector3(x() / vector.x(), y() / vector.y(), z() / vector.z());
 }
 
-Vector3 Vector3::operator+=(const Vector3& vector) {
+Vector3& Vector3::operator+=(const Vector3& vector) {
     *this = *this + vector;
     return *this;
 }
 
-Vector3 Vector3::operator-=(const Vector3& vector) {
+Vector3& Vector3::operator-=(const Vector3& vector) {
     *this = *this - vector;
     return *this;
 }
 
-Vector3 Vector3::operator*=(const double& value) {
+Vector3& Vector3::operator*=(const double& value) {
     *this = *this * value;
     return *this;
 }
 
-Vector3 Vector3::operator*=(const Vector3& vector) {
+Vector3& Vector3::operator*=(const Vector3& vector) {
     *this = *this * vector;
     return *this;
 }
 
-Vector3 Vector3::operator/=(const Vector3& vector) {
+Vector3& Vector3::operator/=(const Vector3& vector) {
     *this = *this / vector;
     return *this;
 }
@@ -59,7 +59,6 @@ Vector3 Vector3::operator/=(const Vector3& vector) {
 Vector3& Vector3::operator=(const Vector3& other) {
     if (&other != this) {
         delete v_;
-        v_ = nullptr;
         v_ = new Elements{*(other.v_)};
     }
     return *this;
