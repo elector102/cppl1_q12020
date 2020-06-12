@@ -6,7 +6,7 @@ set(APP_VERSION_MAJOR 1)
 set(APP_VERSION_MINOR 0)
 
 # GCC flags.
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++14")
 
 # Include paths.
 include_directories(
@@ -16,6 +16,7 @@ include_directories(
 # Library sources.
 set(LIBRARY_SOURCES
 	src/foo.cc
+	src/isometry.cc
 )
 
 # Library creation.
