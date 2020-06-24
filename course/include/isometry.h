@@ -7,6 +7,8 @@
 #include <limits>
 #include <sstream>
 #include <string>
+#include <vector>
+#include <iomanip>
 
 namespace ekumen {
 namespace math {
@@ -28,6 +30,7 @@ class Vector3 {
     public:
         Vector3() : v_(new Elements{}) {};
         Vector3(const double &x, const double &y, const double &z) : v_(new Elements{x, y, z}) {};
+        Vector3(std::initializer_list<double> elements);
         ~Vector3() {
             // deallocate
             delete v_;  
@@ -145,7 +148,9 @@ class Matrix3 {
         Matrix3 operator-(const Matrix3& matrix) const;
         Matrix3 operator*(const double& value) const;
         Matrix3 operator*(const Matrix3& matrix) const;
+        Vector3 operator*(const Vector3& vector) const;
         Matrix3 operator/(const Matrix3& matrix) const;
+        Matrix3 operator/(const double& value) const;
         Matrix3& operator+=(const Matrix3& matrix);
         Matrix3& operator-=(const Matrix3& matrix);
         Matrix3& operator*=(const double& value);
@@ -184,5 +189,36 @@ inline std::ostream& operator<<(std::ostream& os, const Matrix3& matrix) {
               << "]]";
 }
 
+class Isometry {
+   public:
+    Isometry(const Matrix3& rotation);
+    Isometry(const Vector3& translation, const Matrix3& rotation);
+
+    Isometry compose(const Isometry& isometry) const;
+    Isometry inverse() const;
+    Matrix3 rotation() const { return rotation_; };
+    Vector3 transform(Vector3 translation) const { return (rotation_ * translation + translation_); };
+    Vector3 translation() const { return translation_; };
+    static Isometry FromTranslation(const std::initializer_list<double>& values);
+    static Isometry FromEulerAngles(double yaw, double pitch, double roll);
+    static Matrix3 RotateAround(const Vector3& axis, double angle);
+
+    // // Operators
+    bool operator==(const Isometry& isometri) const;
+    Vector3 operator*(const Vector3& vector) const;
+    Isometry operator*(const Isometry& isometry) const;
+
+   private:
+    Matrix3 rotation_;
+    Vector3 translation_;
+};
+
+inline std::ostream& operator<<(std::ostream& os, const Isometry& isometri) {
+    auto rotation = isometri.rotation();
+    return os << "[T: (x: 0, y: 0, z: 0" << "), R:[[" 
+              << std::setprecision(9) << rotation[0][0] << ", " << rotation[0][1] << ", " << rotation[0][2] << "], "
+              << "[" << rotation[1][0] << ", " << rotation[1][1] << ", " << rotation[1][2] << "], "
+              << "[" << rotation[2][0] << ", " << rotation[2][1] << ", " << rotation[2][2] << "]]]";
+}
 }
 }
