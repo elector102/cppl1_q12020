@@ -37,6 +37,10 @@ Vector3 Vector3::operator*(const Vector3& vector) const {
     return Vector3(x() * vector.x(), y() * vector.y(), z() * vector.z());
 }
 
+Vector3 Vector3::operator/(const double& value) const {
+    return Vector3(x() / value, y() / value, z() / value);
+}
+
 Vector3 Vector3::operator/(const Vector3& vector) const {
     return Vector3(x() / vector.x(), y() / vector.y(), z() / vector.z());
 }
@@ -63,6 +67,11 @@ Vector3& Vector3::operator*=(const Vector3& vector) {
 
 Vector3& Vector3::operator/=(const Vector3& vector) {
     *this = *this / vector;
+    return *this;
+}
+
+Vector3& Vector3::operator/=(const double& value) {
+    *this = *this / value;
     return *this;
 }
 
@@ -252,9 +261,9 @@ Vector3 Matrix3::operator*(const Vector3& vector) const {
 
 Matrix3 Matrix3::operator/(const double& value) const {
     Matrix3 aux(*this);
-    aux.r1() *= value;
-    aux.r2() *= value;
-    aux.r2() *= value;
+    aux.r1() /= value;
+    aux.r2() /= value;
+    aux.r2() /= value;
     return aux;
 }
 
@@ -318,6 +327,20 @@ Matrix3& Matrix3::operator=(Matrix3&& matrix) {
     return *this;
 }
 
+Matrix3 Matrix3::inverse() const {
+    Matrix3 aux;
+    aux.r1().x() = r2().y() * r3().z() - r2().z() * r3().y();
+    aux.r1().y() = r1().z() * r3().z() - r1().y() * r3().z();
+    aux.r1().z() = r1().y() * r2().z() - r2().y() * r1().z();
+    aux.r2().x() = r2().z() * r3().x() - r2().x() * r3().z();
+    aux.r2().y() = r1().x() * r3().z() - r1().z() * r3().x();
+    aux.r2().z() = r1().z() * r2().x() - r1().x() * r2().z();
+    aux.r3().x() = r2().x() * r3().y() - r2().y() * r3().x();
+    aux.r3().y() = r1().y() * r3().x() - r1().x() * r3().y();
+    aux.r3().z() = r1().x() * r2().y() - r1().y() * r2().x();
+    return aux/((*this).det());
+}
+
 double Matrix3::det() const {
     double subdet1 = r2()[1] * r3()[2] - r2()[2] * r3()[1];
     double subdet2 = r2()[0] * r3()[2] - r2()[2] * r3()[0];
@@ -355,37 +378,21 @@ Isometry Isometry::inverse() const {
     if (almost_equal(det, 0., 4)) {
         throw std::domain_error("It can not get the inverse of the matrix");
     }
-    Matrix3 rot_result;
-    rot_result.r1().x() = (rotation_.r2().y() * rotation_.r3().z()) - (rotation_.r3().y() * rotation_.r2().z());
-    rot_result.r1().y() = (rotation_.r1().z() * rotation_.r3().y()) - (rotation_.r3().z() * rotation_.r1().y());
-    rot_result.r1().z() = (rotation_.r1().y() * rotation_.r2().z()) - (rotation_.r2().y() * rotation_.r1().z());
-
-    rot_result.r2().x() = (rotation_.r2().z() * rotation_.r3().x()) - (rotation_.r3().z() * rotation_.r2().x());
-    rot_result.r2().y() = (rotation_.r1().x() * rotation_.r3().z()) - (rotation_.r3().x() * rotation_.r1().z());
-    rot_result.r2().z() = (rotation_.r1().z() * rotation_.r2().x()) - (rotation_.r2().z() * rotation_.r1().x());
-
-    rot_result.r3().x() = (rotation_.r2().x() * rotation_.r3().y()) - (rotation_.r3().x() * rotation_.r2().y());
-    rot_result.r3().y() = (rotation_.r1().y() * rotation_.r3().x()) - (rotation_.r3().y() * rotation_.r1().x());
-    rot_result.r3().z() = (rotation_.r1().x() * rotation_.r2().y()) - (rotation_.r2().x() * rotation_.r1().y());
-
-    rot_result = rot_result / det;
-    auto vector_result = rot_result * translation_;
-    vector_result = vector_result * (-1);
-
-    return Isometry(vector_result, rot_result);
+    auto vector_result = (rotation_.inverse() * translation_) * -1;
+    return Isometry{vector_result, rotation_.inverse()};
 }
 
-Isometry Isometry::FromTranslation(const std::initializer_list<double>& values) {
-    return Isometry(Vector3(values), Matrix3::kIdentity);
+Isometry Isometry::FromTranslation(const Vector3& vector) {
+    return Isometry(vector, Matrix3::kIdentity);
 }
 
-Isometry Isometry::FromEulerAngles(double yaw, double pitch, double roll) {
+Isometry Isometry::FromEulerAngles(const double yaw, const double pitch, const double roll) {
     Isometry result = Isometry(RotateAround(Vector3::kUnitX, yaw)) * Isometry(RotateAround(Vector3::kUnitY, pitch)) *
             Isometry(RotateAround(Vector3::kUnitZ, roll));
     return result;
 }
 
-Matrix3 Isometry::RotateAround(const Vector3& axis, double angle) {
+Isometry Isometry::RotateAround(const Vector3& axis, const double angle) {
     Matrix3 result;
     auto cos = std::cos(angle);
     auto sin = std::sin(angle);
@@ -400,15 +407,15 @@ Matrix3 Isometry::RotateAround(const Vector3& axis, double angle) {
     result.r3().x() = axis.z() * axis.x() * (1 - cos) + axis.y() * sin;
     result.r3().y() = axis.z() * axis.y() * (1 - cos) + axis.x() * sin;
     result.r3().z() = cos + (axis.z() * axis.z()) * (1 - cos);
-    return result;
+    return Isometry(Vector3(), result);
 }
 
 // // Operators
-bool Isometry::operator==(const Isometry& isometri) const {
-    if (rotation_ != isometri.rotation_) {
+bool Isometry::operator==(const Isometry& isometry) const {
+    if (rotation_ != isometry.rotation_) {
         return false;
     }
-    if (translation_ != isometri.translation_) {
+    if (translation_ != isometry.translation_) {
         return false;
     }
     return true;
@@ -419,10 +426,7 @@ Vector3 Isometry::operator*(const Vector3& vector) const{
 }
 
 Isometry Isometry::operator*(const Isometry& isometry) const {
-    Isometry aux(*this);
-    aux.rotation_ *= isometry.rotation();
-    aux.translation_ = (aux.rotation_ * isometry.translation()) + aux.translation_;
-    return aux;
+    return Isometry((rotation_ * isometry.translation()) + translation_, rotation_ * isometry.rotation());
 }
 
 }

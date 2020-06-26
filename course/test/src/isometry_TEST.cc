@@ -35,6 +35,22 @@ testing::AssertionResult areAlmostEqual(const Isometry& isometri1, const Isometr
   return testing::AssertionSuccess();
 }
 
+testing::AssertionResult areAlmostEqual(const Matrix3& matrix1, const Matrix3& matrix2, const double tolerance) {
+  if (std::abs(matrix1.r1().x() - matrix2.r1().x()) > tolerance ||
+          std::abs(matrix1.r1().y() - matrix2.r1().y()) > tolerance ||
+          std::abs(matrix1.r1().z()- matrix2.r1().z()) > tolerance ||
+          std::abs(matrix1.r2().x() - matrix2.r2().x()) > tolerance ||
+          std::abs(matrix1.r2().y() - matrix2.r2().y()) > tolerance ||
+          std::abs(matrix1.r2().z() - matrix2.r2().z()) > tolerance ||
+          std::abs(matrix1.r3().x() - matrix2.r3().x()) > tolerance ||
+          std::abs(matrix1.r3().y()- matrix2.r3().y()) > tolerance ||
+          std::abs(matrix1.r3().z() - matrix2.r3().z()) > tolerance){
+    return testing::AssertionFailure() << "The isometrys are not almost equal";
+  }
+  return testing::AssertionSuccess();
+}
+
+
 GTEST_TEST(Vector3Test, Vector3Operations) {
   const double kTolerance{1e-12};
   const Vector3 p{1., 2., 3.};
@@ -87,7 +103,7 @@ GTEST_TEST(Vector3Test, Vector3Operations) {
 
 GTEST_TEST(Matrix3Test, Matrix3Operations) {
   const double kTolerance{1e-12};
-  Matrix3 m1{{1., 2., 3.}, {4., 5., 6.}, {7., 8., 9.}};
+  Matrix3 m1{Vector3{1., 2., 3.}, Vector3{4., 5., 6.}, Vector3{7., 8., 9.}};
   const Matrix3 m2{1., 2., 3., 4., 5., 6., 7., 8., 9.};
   const Matrix3 m3 = Matrix3::kIdentity;
 
@@ -131,14 +147,14 @@ GTEST_TEST(Matrix3Test, Matrix3Operations) {
 
 GTEST_TEST(IsometryTest, IsometryOperations) {
   const double kTolerance{1e-12};
-  const Isometry t1 = Isometry::FromTranslation({1., 2., 3.});
-  const Isometry t2{{1., 2., 3.}, Matrix3::kIdentity};
+  const Isometry t1 = Isometry::FromTranslation(Vector3{1., 2., 3.});
+  const Isometry t2{Vector3{1., 2., 3.}, Matrix3::kIdentity};
 
   EXPECT_EQ(t1, t2);
 
   // This is not mathematically correct but it could be a nice to have.
   EXPECT_EQ(t1 * Vector3(1., 1., 1.), Vector3(2., 3., 4.));
-  EXPECT_EQ(t1.transform({1., 1., 1.}), Vector3(2., 3., 4.));
+  EXPECT_EQ(t1.transform(Vector3{1., 1., 1.}), Vector3(2., 3., 4.));
   EXPECT_EQ(t1.inverse() * Vector3(2., 3., 4.), Vector3(1., 1., 1.));
   EXPECT_EQ(t1 * t2 * Vector3(1., 1., 1.), Vector3(3., 5., 7.));
   EXPECT_EQ(t1.compose(t2) * Vector3(1., 1., 1.), Vector3(3., 5., 7.));

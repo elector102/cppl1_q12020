@@ -1,4 +1,4 @@
-
+#pragma once
 
 // Standard libraries
 #include <cmath>
@@ -30,7 +30,7 @@ class Vector3 {
     public:
         Vector3() : v_(new Elements{}) {};
         Vector3(const double &x, const double &y, const double &z) : v_(new Elements{x, y, z}) {};
-        Vector3(std::initializer_list<double> elements);
+        explicit Vector3(std::initializer_list<double> elements);
         ~Vector3() {
             // deallocate
             delete v_;  
@@ -60,11 +60,13 @@ class Vector3 {
         Vector3 operator-(const Vector3& vector) const;
         Vector3 operator*(const double& value) const;
         Vector3 operator*(const Vector3& vector) const;
+        Vector3 operator/(const double& value) const;
         Vector3 operator/(const Vector3& vector) const;
         Vector3& operator+=(const Vector3& vector);
         Vector3& operator-=(const Vector3& vector);
         Vector3& operator*=(const double& value);
         Vector3& operator*=(const Vector3& vector);
+        Vector3& operator/=(const double& vector);
         Vector3& operator/=(const Vector3& vector);
         const double& operator[](const int &index) const;
         double& operator[](const int &index);
@@ -161,6 +163,7 @@ class Matrix3 {
         Matrix3& operator=(const Matrix3& matrix);
         Matrix3& operator=(Matrix3&& matrix);
         double det() const;
+        Matrix3 inverse() const; 
 
         // Constants
         static const Matrix3 kIdentity;
@@ -191,20 +194,20 @@ inline std::ostream& operator<<(std::ostream& os, const Matrix3& matrix) {
 
 class Isometry {
    public:
-    Isometry(const Matrix3& rotation);
+    explicit Isometry(const Matrix3& rotation);
     Isometry(const Vector3& translation, const Matrix3& rotation);
 
     Isometry compose(const Isometry& isometry) const;
     Isometry inverse() const;
-    Matrix3 rotation() const { return rotation_; };
-    Vector3 transform(Vector3 translation) const { return (rotation_ * translation + translation_); };
-    Vector3 translation() const { return translation_; };
-    static Isometry FromTranslation(const std::initializer_list<double>& values);
-    static Isometry FromEulerAngles(double yaw, double pitch, double roll);
-    static Matrix3 RotateAround(const Vector3& axis, double angle);
+    const Matrix3& rotation() const { return rotation_; };
+    Vector3 transform(const Vector3 translation) const { return (rotation_ * translation + translation_); };
+    const Vector3& translation() const { return translation_; };
+    static Isometry FromTranslation(const Vector3& values);
+    static Isometry FromEulerAngles(const double yaw, const double pitch, const double roll);
+    static Isometry RotateAround(const Vector3& axis, const double angle);
 
     // // Operators
-    bool operator==(const Isometry& isometri) const;
+    bool operator==(const Isometry& isometry) const;
     Vector3 operator*(const Vector3& vector) const;
     Isometry operator*(const Isometry& isometry) const;
 
