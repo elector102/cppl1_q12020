@@ -200,7 +200,7 @@ class Isometry {
     Isometry compose(const Isometry& isometry) const;
     Isometry inverse() const;
     const Matrix3& rotation() const { return rotation_; };
-    Vector3 transform(const Vector3 translation) const { return (rotation_ * translation + translation_); };
+    Vector3 transform(const Vector3& translation) const { return (rotation_ * translation + translation_); };
     const Vector3& translation() const { return translation_; };
     static Isometry FromTranslation(const Vector3& values);
     static Isometry FromEulerAngles(const double yaw, const double pitch, const double roll);

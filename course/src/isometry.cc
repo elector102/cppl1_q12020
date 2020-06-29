@@ -328,6 +328,9 @@ Matrix3& Matrix3::operator=(Matrix3&& matrix) {
 }
 
 Matrix3 Matrix3::inverse() const {
+    if (almost_equal(det(), 0., 4)) {
+        throw std::domain_error("It can not get the inverse of the matrix");
+    }
     Matrix3 aux;
     aux.r1().x() = r2().y() * r3().z() - r2().z() * r3().y();
     aux.r1().y() = r1().z() * r3().z() - r1().y() * r3().z();
@@ -374,10 +377,6 @@ Isometry Isometry::compose(const Isometry& isometry) const {
 };
 
 Isometry Isometry::inverse() const {
-    auto det = rotation_.det();
-    if (almost_equal(det, 0., 4)) {
-        throw std::domain_error("It can not get the inverse of the matrix");
-    }
     auto vector_result = (rotation_.inverse() * translation_) * -1;
     return Isometry{vector_result, rotation_.inverse()};
 }
