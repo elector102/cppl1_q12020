@@ -11,6 +11,16 @@ const Vector3 Vector3::kUnitY = Vector3(0., 1., 0.);
 const Vector3 Vector3::kUnitZ = Vector3(0., 0., 1.);
 const Vector3 Vector3::kZero = Vector3(0., 0., 0.);
 
+Vector3::Vector3(std::initializer_list<double> elements) : v_(new Elements{}){
+    if (elements.size() != 3) {
+        throw std::range_error("Elements out of range, Vector3 only have three elements");
+    }
+    auto it = elements.begin();
+    v_->x_ = *it++;
+    v_->y_ = *it++;
+    v_->z_ = *it++;
+}
+
 Vector3 Vector3::operator+(const Vector3& vector) const {
     return Vector3(x() + vector.x(), y() + vector.y(), z() + vector.z());
 }
@@ -25,6 +35,10 @@ Vector3 Vector3::operator*(const double& value) const {
 
 Vector3 Vector3::operator*(const Vector3& vector) const {
     return Vector3(x() * vector.x(), y() * vector.y(), z() * vector.z());
+}
+
+Vector3 Vector3::operator/(const double& value) const {
+    return Vector3(x() / value, y() / value, z() / value);
 }
 
 Vector3 Vector3::operator/(const Vector3& vector) const {
@@ -53,6 +67,11 @@ Vector3& Vector3::operator*=(const Vector3& vector) {
 
 Vector3& Vector3::operator/=(const Vector3& vector) {
     *this = *this / vector;
+    return *this;
+}
+
+Vector3& Vector3::operator/=(const double& value) {
+    *this = *this / value;
     return *this;
 }
 
@@ -232,6 +251,22 @@ Matrix3 Matrix3::operator/(const Matrix3& matrix) const {
     return aux;
 }
 
+Vector3 Matrix3::operator*(const Vector3& vector) const {
+    Vector3 result;
+    result.x() = r1().x() * vector.x() + r1().y() * vector.y() + r1().z() * vector.z();
+    result.y() = r2().x() * vector.x() + r2().y() * vector.y() + r2().z() * vector.z();
+    result.z() = r3().x() * vector.x() + r3().y() * vector.y() + r3().z() * vector.z();
+    return result;
+}
+
+Matrix3 Matrix3::operator/(const double& value) const {
+    Matrix3 aux(*this);
+    aux.r1() /= value;
+    aux.r2() /= value;
+    aux.r2() /= value;
+    return aux;
+}
+
 Matrix3& Matrix3::operator+=(const Matrix3& matrix) {
     r1() += matrix.r1();
     r2() += matrix.r2();
@@ -292,6 +327,23 @@ Matrix3& Matrix3::operator=(Matrix3&& matrix) {
     return *this;
 }
 
+Matrix3 Matrix3::inverse() const {
+    if (almost_equal(det(), 0., 4)) {
+        throw std::domain_error("It can not get the inverse of the matrix");
+    }
+    Matrix3 aux;
+    aux.r1().x() = r2().y() * r3().z() - r2().z() * r3().y();
+    aux.r1().y() = r1().z() * r3().z() - r1().y() * r3().z();
+    aux.r1().z() = r1().y() * r2().z() - r2().y() * r1().z();
+    aux.r2().x() = r2().z() * r3().x() - r2().x() * r3().z();
+    aux.r2().y() = r1().x() * r3().z() - r1().z() * r3().x();
+    aux.r2().z() = r1().z() * r2().x() - r1().x() * r2().z();
+    aux.r3().x() = r2().x() * r3().y() - r2().y() * r3().x();
+    aux.r3().y() = r1().y() * r3().x() - r1().x() * r3().y();
+    aux.r3().z() = r1().x() * r2().y() - r1().y() * r2().x();
+    return aux/((*this).det());
+}
+
 double Matrix3::det() const {
     double subdet1 = r2()[1] * r3()[2] - r2()[2] * r3()[1];
     double subdet2 = r2()[0] * r3()[2] - r2()[2] * r3()[0];
@@ -307,6 +359,74 @@ const Matrix3 Matrix3::kZero =
 
 const Matrix3 Matrix3::kOnes = 
     Matrix3(Vector3(1, 1, 1), Vector3(1, 1, 1), Vector3(1, 1, 1));
+
+// Isometry
+Isometry::Isometry(const Matrix3& rotation) {
+    rotation_ = rotation;
+    translation_ = Vector3(0.0, 0.0, 0.0);
+}
+
+Isometry::Isometry(const Vector3& translation, const Matrix3& rotation) {
+    rotation_ = rotation;
+    translation_ = translation;
+}
+
+Isometry Isometry::compose(const Isometry& isometry) const {
+    Isometry aux(*this);
+    return Isometry(*this) = aux * isometry;
+};
+
+Isometry Isometry::inverse() const {
+    auto vector_result = (rotation_.inverse() * translation_) * -1;
+    return Isometry{vector_result, rotation_.inverse()};
+}
+
+Isometry Isometry::FromTranslation(const Vector3& vector) {
+    return Isometry(vector, Matrix3::kIdentity);
+}
+
+Isometry Isometry::FromEulerAngles(const double yaw, const double pitch, const double roll) {
+    Isometry result = Isometry(RotateAround(Vector3::kUnitX, yaw)) * Isometry(RotateAround(Vector3::kUnitY, pitch)) *
+            Isometry(RotateAround(Vector3::kUnitZ, roll));
+    return result;
+}
+
+Isometry Isometry::RotateAround(const Vector3& axis, const double angle) {
+    Matrix3 result;
+    auto cos = std::cos(angle);
+    auto sin = std::sin(angle);
+    result.r1().x() = cos + (axis.x() * axis.x()) * (1 - cos);
+    result.r1().y() = axis.x() * axis.y() * (1 - cos) - axis.z() * sin;
+    result.r1().z() = axis.x() * axis.z() * (1 - cos) + axis.y() * sin;
+
+    result.r2().x() = axis.y() * axis.x() * (1 - cos) + axis.z() * sin;
+    result.r2().y() = cos + (axis.y() * axis.y()) * (1 - cos);
+    result.r2().z() = axis.y() * axis.z() * (1 - cos) - axis.x() * sin;
+
+    result.r3().x() = axis.z() * axis.x() * (1 - cos) + axis.y() * sin;
+    result.r3().y() = axis.z() * axis.y() * (1 - cos) + axis.x() * sin;
+    result.r3().z() = cos + (axis.z() * axis.z()) * (1 - cos);
+    return Isometry(Vector3(), result);
+}
+
+// // Operators
+bool Isometry::operator==(const Isometry& isometry) const {
+    if (rotation_ != isometry.rotation_) {
+        return false;
+    }
+    if (translation_ != isometry.translation_) {
+        return false;
+    }
+    return true;
+}
+
+Vector3 Isometry::operator*(const Vector3& vector) const{
+    return (rotation_ * vector + translation_);
+}
+
+Isometry Isometry::operator*(const Isometry& isometry) const {
+    return Isometry((rotation_ * isometry.translation()) + translation_, rotation_ * isometry.rotation());
+}
 
 }
 }
